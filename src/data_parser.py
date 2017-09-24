@@ -55,7 +55,6 @@ def process_data(data_dir, processed_dir, max_degree):
         if os.path.isdir(os.path.join(data_dir, year_dir)):
             # Write the processed year to a file.
             with open(os.path.join(processed_dir, year_dir) + ".pkl", 'wb') as f:
-                print year_dir
                 pickle.dump(process_year(os.path.join(data_dir, year_dir), max_degree), f, pickle.HIGHEST_PROTOCOL)
 
 def main():
