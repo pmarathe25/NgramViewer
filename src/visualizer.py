@@ -17,19 +17,23 @@ from bokeh.models.widgets import TextInput, Button, Dropdown
 from autocorrect import spell
 from vocabulary.vocabulary import Vocabulary as vb
 
-def load_data(processed_dir):
+def load_data(processed_dir, start_year, num_years):
     """
     Loads data. Year data can be indexed as follows:
 
     count = data[year][n-gram degree][0][n-gram]
     total = data[year][n-gram degree][1]
     """
-    year_data = []
-    for dataset in [os.path.join(processed_dir, s) for s in os.listdir(processed_dir)]:
+
+    print num_years
+
+    year_data = [None] * num_years
+    for dataset in os.listdir(processed_dir):
         if dataset[-3:] == "pkl":
-            with open(dataset, 'rb') as f:
+            with open(os.path.join(processed_dir, dataset), 'rb') as f:
                 print "Loading %r..." % dataset
-                year_data.append(pickle.load(f))
+                print int(dataset[0:-4]) - start_year
+                year_data[int(dataset[0:-4]) - start_year] = pickle.load(f)
     return year_data
 
 def spell_check(query):
@@ -111,7 +115,6 @@ def create_plot(attr, old, new):
             suggestion += spell_check(query) + ", "
             y_axis = ngram_occurrences(query, year_data)
             # Now sort the axes in year-order
-            x_axis, y_axis = (list(t) for t in zip(*sorted(zip(x_axis, y_axis))))
             xs.append(x_axis)
             ys.append(y_axis)
     # Update the plot
@@ -136,10 +139,12 @@ def replace_synonym(attr, old, new):
     synonym_suggestions.menu = new_synonyms
 
 processed_dir = "processed/" if len(sys.argv) < 2 else sys.argv[1]
+start_year = 2012 if len(sys.argv) < 3 else sys.argv[2]
+num_years = 5 if len(sys.argv) < 4 else sys.argv[3]
 # Load all the pickle files.
-year_data = load_data(processed_dir)
+year_data = load_data(processed_dir, start_year, num_years)
 # Create the front-end
-x_axis = [s.replace(".pkl", "") for s in os.listdir(processed_dir)]
+x_axis = range(start_year, start_year + num_years)
 # User Input
 text_input = TextInput(value = "", title = "Graph these comma-separated phrases:")
 text_input.on_change("value", create_plot)

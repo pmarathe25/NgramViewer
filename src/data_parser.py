@@ -44,6 +44,9 @@ def process_year(year_dir, max_degree):
     # Now loop over all the books this year and create a dictionary file for n-grams.
     for book in [os.path.join(year_dir, s) for s in os.listdir(year_dir)]:
         append_book_ngrams(book, ngrams, max_degree)
+
+    print ngrams[4][0]["of The Return of Tarzan"]
+
     return ngrams
 
 def process_data(data_dir, processed_dir, max_degree):
@@ -55,6 +58,7 @@ def process_data(data_dir, processed_dir, max_degree):
         if os.path.isdir(os.path.join(data_dir, year_dir)):
             # Write the processed year to a file.
             with open(os.path.join(processed_dir, year_dir) + ".pkl", 'wb') as f:
+                print year_dir
                 pickle.dump(process_year(os.path.join(data_dir, year_dir), max_degree), f, pickle.HIGHEST_PROTOCOL)
 
 def main():
