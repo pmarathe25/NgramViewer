@@ -3,7 +3,8 @@ This is an n-gram viewer for a small dataset of books from 2012-2016
 
 # Installation
 1. Download and unzip (or clone) the git repository.
-2. Install dependencies.
+2. Open a terminal and navigate to the folder where you extracted the repository. For example `cd ~/Downloads/NgramViewer-master/`.
+3. Install dependencies.
     1. Make sure the install script is executable with `chmod +x ./install.sh`
     2. Run `./install.sh`. This may take a while.
 
