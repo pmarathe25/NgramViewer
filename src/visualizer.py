@@ -95,7 +95,7 @@ def suggestion_handler():
 
 def create_plot(attr, old, new):
     """
-    Displays plot
+    Displays plot from a list of queries.
     """
     global x_axis, year_data
     generate_synonyms.label = "Generate synonyms"
