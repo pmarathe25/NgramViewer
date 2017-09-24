@@ -3,8 +3,9 @@ import re
 import sys
 import pickle
 from collections import deque, defaultdict
+from Tree import Tree
 
-def append_book_ngrams(book, ngrams, max_degree):
+def append_book_ngrams(book, ngrams, total_counts, max_degree):
     """
     Appends all n-grams length 1 to n from a book to an existing list of dictionaries of n-grams.
     """
@@ -17,13 +18,12 @@ def append_book_ngrams(book, ngrams, max_degree):
                 word_buffer.append(word)
                 word_buffer.popleft()
                 # Now loop over the word buffer and create appropriate n-grams
-                ngram = ""
+                ngram = []
                 for index, word in enumerate(word_buffer):
-                    ngram += " " + word
-                    ngram = ngram.strip()
+                    ngram.append(word.strip())
                     # Add to dictionary and also increment the total counts.
-                    ngrams[index][0][ngram] += 1
-                    ngrams[index][1] += 1
+                    total_counts[index] += 1
+                    ngrams.get(ngram).value = 1 if ngrams.get(ngram).value is None else ngrams.get(ngram).value + 1
 
 def process_year(year_dir, max_degree):
     """
@@ -31,13 +31,12 @@ def process_year(year_dir, max_degree):
 
     [1-grams: [{word: count}, total], 2-grams: [{word: count}, total], ..., n-grams: [{word: count}, total] ]
     """
-    ngrams = []
-    for x in range(max_degree):
-        ngrams.append([defaultdict(int), 0])
+    ngrams = Tree()
+    total_counts = [0] * max_degree
     # Now loop over all the books this year and create a dictionary file for n-grams.
     for book in [os.path.join(year_dir, s) for s in os.listdir(year_dir)]:
-        append_book_ngrams(book, ngrams, max_degree)
-    return ngrams
+        append_book_ngrams(book, ngrams, total_counts, max_degree)
+    return [ngrams, total_counts]
 
 def process_data(data_dir, processed_dir, max_degree):
     # Loop over every year in the data set.

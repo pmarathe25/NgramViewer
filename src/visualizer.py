@@ -2,6 +2,7 @@ import os
 import sys
 import pickle
 import random
+from Tree import Tree
 from bokeh.io import curdoc
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import ColumnDataSource
@@ -23,10 +24,13 @@ def load_data(processed_dir):
     return year_data
 
 def ngram_occurrences(query, data):
-    degree = len(query.split()) - 1
+    query_list = query.split()
+    degree = len(query_list) - 1
     occurrences = []
     for year in data:
-        occurrences.append(year[degree][0][query] / float(year[degree][1]))
+        print (year[0].get(query_list)).value
+        print (year[0].get(query_list))
+        occurrences.append(year[0].get(query_list).value / float(year[1][degree]))
     return occurrences
 
 def generate_color(hex_length = 6):
