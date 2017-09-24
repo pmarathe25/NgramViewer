@@ -24,15 +24,11 @@ def load_data(processed_dir, start_year, num_years):
     count = data[year][n-gram degree][0][n-gram]
     total = data[year][n-gram degree][1]
     """
-
-    print num_years
-
     year_data = [None] * num_years
     for dataset in os.listdir(processed_dir):
         if dataset[-3:] == "pkl":
             with open(os.path.join(processed_dir, dataset), 'rb') as f:
                 print "Loading %r..." % dataset
-                print int(dataset[0:-4]) - start_year
                 year_data[int(dataset[0:-4]) - start_year] = pickle.load(f)
     return year_data
 
