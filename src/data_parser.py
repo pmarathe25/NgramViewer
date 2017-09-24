@@ -1,7 +1,7 @@
 ######################################################################################
 # Pranav Marathe
 # September 24, 2017
-# This code parses books and creates dicitonaries of n-grams. 
+# This code parses books and creates dicitonaries of n-grams.
 ######################################################################################
 
 import os
@@ -47,6 +47,9 @@ def process_year(year_dir, max_degree):
     return ngrams
 
 def process_data(data_dir, processed_dir, max_degree):
+    """
+    Loops over every year and creates a pkl file.
+    """
     # Loop over every year in the data set.
     for year_dir in os.listdir(data_dir):
         if os.path.isdir(os.path.join(data_dir, year_dir)):

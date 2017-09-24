@@ -19,7 +19,7 @@ from vocabulary.vocabulary import Vocabulary as vb
 
 def load_data(processed_dir):
     """
-    Year data can be indexed as follows:
+    Loads data. Year data can be indexed as follows:
 
     count = data[year][n-gram degree][0][n-gram]
     total = data[year][n-gram degree][1]
@@ -33,6 +33,9 @@ def load_data(processed_dir):
     return year_data
 
 def spell_check(query):
+    """
+    Takes an n-gram and fixes spelling
+    """
     query_list = query.split()
     for index, q in enumerate(query_list):
         query_list[index] = spell(q.strip())
@@ -40,6 +43,9 @@ def spell_check(query):
     return suggestion.strip()
 
 def ngram_occurrences(query, data):
+    """
+    How many times per total # n-grams does this one occur each year?
+    """
     degree = len(query.split()) - 1
     occurrences = []
     for year in data:
@@ -47,12 +53,18 @@ def ngram_occurrences(query, data):
     return occurrences
 
 def generate_color(hex_length = 6):
+    """
+    Colors!
+    """
     color = "#"
     for i in range(hex_length):
         color += str(random.choice("0123456789ABCDEF"))
     return color
 
 def generate_synonym_list(query):
+    """
+    Creates a list of synonym suggestions for important words in the query
+    """
     synonym_list = []
     for word in query.split():
         syn = vb.synonym(word)
@@ -63,7 +75,10 @@ def generate_synonym_list(query):
                 synonym_list.append(("Replace %s with %s" % (word, synonym['text']), word + " " + synonym['text']))
     return synonym_list
 
-def synonym_handler():
+def synonym_button_handler():
+    """
+    Gemerates a list of synonyms
+    """
     generate_synonyms.label = "Generating synonyms..."
     synonym_list = []
     for query in text_input.value.split(","):
@@ -72,10 +87,16 @@ def synonym_handler():
     generate_synonyms.label = "Done!"
 
 def suggestion_handler():
+    """
+    Replaces words in query with correct spellings.
+    """
     if spelling_suggestions.label.strip() != "":
         text_input.value = spelling_suggestions.label[13:-1].strip()
 
-def text_input_handler(attr, old, new):
+def create_plot(attr, old, new):
+    """
+    Displays plot
+    """
     global x_axis, year_data
     generate_synonyms.label = "Generate synonyms"
     # Generate outputs from all queries
@@ -98,6 +119,9 @@ def text_input_handler(attr, old, new):
     source.data = {'xs': xs, 'ys': ys, 'labels': queries, 'colors': [generate_color() for q in queries]}
 
 def replace_synonym(attr, old, new):
+    """
+    When a synonym is selected, replaces the appropriate word in the query and updates the list.
+    """
     word = synonym_suggestions.value.split()[0].strip()
     synonym = synonym_suggestions.value.split()[1].strip()
     text_input.value = text_input.value.replace(word, synonym)
@@ -118,13 +142,13 @@ year_data = load_data(processed_dir)
 x_axis = [s.replace(".pkl", "") for s in os.listdir(processed_dir)]
 # User Input
 text_input = TextInput(value = "", title = "Graph these comma-separated phrases:")
-text_input.on_change("value", text_input_handler)
+text_input.on_change("value", create_plot)
 # Spell check
 spelling_suggestions = Button(label = "")
 spelling_suggestions.on_click(suggestion_handler)
 # Generate synonyms
 generate_synonyms = Button(label = "Generate synonyms")
-generate_synonyms.on_click(synonym_handler)
+generate_synonyms.on_click(synonym_button_handler)
 # Dropdown to select replacement synonyms
 synonym_suggestions = Dropdown(label = "Synonyms", menu = [])
 synonym_suggestions.on_change("value", replace_synonym)
