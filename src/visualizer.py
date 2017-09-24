@@ -17,17 +17,15 @@ def load_data(processed_dir):
     """
     year_data = []
     for dataset in [os.path.join(processed_dir, s) for s in os.listdir(processed_dir)]:
-        with open(dataset, 'rb') as f:
-            year_data.append(pickle.load(f))
+        if dataset[-3:] == "pkl":
+            with open(dataset, 'rb') as f:
+                year_data.append(pickle.load(f))
     return year_data
 
 def ngram_occurrences(query, data):
     degree = len(query.split()) - 1
     occurrences = []
     for year in data:
-        print query
-        print year[degree][0][query]
-        print float(year[degree][1])
         occurrences.append(year[degree][0][query] / float(year[degree][1]))
     return occurrences
 
@@ -42,15 +40,16 @@ def my_text_input_handler(attr, old, new):
     # Generate outputs from all queries
     xs = []
     ys = []
-    queries = [q.strip() for q in new.split(",")]
-    for index, query in enumerate(queries):
-        y_axis = ngram_occurrences(query, year_data)
-        print query
-        print y_axis
-        # Now sort the axes in year-order
-        x_axis, y_axis = (list(t) for t in zip(*sorted(zip(x_axis, y_axis))))
-        xs.append(x_axis)
-        ys.append(y_axis)
+    queries = []
+    for query in new.split(","):
+        query = query.strip()
+        if query != "":
+            queries.append(query)
+            y_axis = ngram_occurrences(query, year_data)
+            # Now sort the axes in year-order
+            x_axis, y_axis = (list(t) for t in zip(*sorted(zip(x_axis, y_axis))))
+            xs.append(x_axis)
+            ys.append(y_axis)
     # Update the plot
     source.data = {'xs': xs, 'ys': ys, 'labels': queries, 'colors': [generate_color() for q in queries]}
 
@@ -59,13 +58,12 @@ processed_dir = "processed/" if len(sys.argv) < 2 else sys.argv[1]
 year_data = load_data(processed_dir)
 # Create the front-end
 x_axis = [s.replace(".pkl", "") for s in os.listdir(processed_dir)]
-# Output to static HTML
-output_file("index.html")
-p = figure(title = "Ngram Viewer", x_axis_label = 'Year', y_axis_label = 'Frequency')
-source = ColumnDataSource({'xs': [], 'ys': [], 'labels': [], 'colors': []})
-p.multi_line('xs', 'ys', line_width = 2, color = 'colors', legend = 'labels', source = source)
-# Plot!
+# User Input
 text_input = TextInput(value = "", title = "Graph these comma-separated phrases:")
 text_input.on_change("value", my_text_input_handler)
+# Plot!
+p = figure(title = "Ngram Viewer", x_axis_label = 'Year', y_axis_label = 'Frequency', min_border = 75, plot_width = 900, plot_height = 700)
+source = ColumnDataSource({'xs': [], 'ys': [], 'labels': [], 'colors': []})
+p.multi_line('xs', 'ys', line_width = 2, color = 'colors', legend = 'labels', source = source)
 # Show
 curdoc().add_root(column(widgetbox(text_input), p))
