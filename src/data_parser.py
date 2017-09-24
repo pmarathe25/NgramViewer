@@ -1,3 +1,9 @@
+######################################################################################
+# Pranav Marathe
+# September 24, 2017
+# This code parses books and creates dicitonaries of n-grams. 
+######################################################################################
+
 import os
 import re
 import sys
@@ -8,6 +14,7 @@ def append_book_ngrams(book, ngrams, max_degree):
     """
     Appends all n-grams length 1 to n from a book to an existing list of dictionaries of n-grams.
     """
+    print "Processing %r..." % book
     word_buffer = deque([""] * max_degree)
     with open(book) as f:
         for line in f:
